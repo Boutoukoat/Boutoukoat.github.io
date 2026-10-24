@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Animated Spherical Levy Flight (Geodesic Arcs)</title>
+    <title>Animated Spherical Levy Flight (r128 Compatible)</title>
     <style>
         body { margin: 0; overflow: hidden; background-color: #050505; font-family: sans-serif;}
         canvas { display: block; }
@@ -13,7 +13,7 @@
             white-space: pre-line;
         }
     </style>
-    <!-- Use Cloudflare CDNJS URLs to completely bypass jsdelivr network blocks -->
+    <!-- Using your working network CDN paths for r128 -->
     <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/build/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/examples/js/controls/OrbitControls.js"></script>
 </head>
@@ -46,11 +46,10 @@
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    // OrbitControls is globally exposed under THREE using this CDN style
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
 
-    // 3. Add Atmosphere & Base Sphere
+    // 3. Add Base Sphere
     const sphereRadius = 8;
     const sphereGeo = new THREE.SphereGeometry(sphereRadius, 48, 48);
     const sphereMat = new THREE.MeshBasicMaterial({ 
@@ -77,6 +76,7 @@
         
         let startPos = currentPos.clone();
         
+        // Compute end positions for this step
         let moveQuaternion = new THREE.Quaternion().setFromAxisAngle(rightDir, stepLengthRad);
         currentPos.applyQuaternion(moveQuaternion);
         forwardDir.applyQuaternion(moveQuaternion);
@@ -84,13 +84,18 @@
         
         let endPos = currentPos.clone();
 
+        // REPLACEMENT FIX FOR Missing Vector3.slerp in r128:
+        // We use an axis-angle quaternion rotation to perfectly interpolate along the great circle
         for (let j = 0; j <= segmentsPerStep; j++) {
             let t = j / segmentsPerStep;
-            let arcPoint = new THREE.Vector3().copy(startPos).slerp(endPos, t);
+            let currentArcAngle = stepLengthRad * t;
+            let arcQuaternion = new THREE.Quaternion().setFromAxisAngle(rightDir, currentArcAngle);
+            
+            let arcPoint = startPos.clone().applyQuaternion(arcQuaternion);
             pathSegments.push(arcPoint);
         }
 
-        let turnAngle = THREE.Math.degToRad(-120); 
+        let turnAngle = THREE.MathUtils.degToRad(-120); 
         let turnQuaternion = new THREE.Quaternion().setFromAxisAngle(normalDir, turnAngle);
         forwardDir.applyQuaternion(turnQuaternion);
     }
@@ -99,7 +104,6 @@
     const maxPoints = pathSegments.length;
     const positions = new Float32Array(maxPoints * 3);
     
-    // Seed initial point
     positions[0] = pathSegments[0].x;
     positions[1] = pathSegments[0].y;
     positions[2] = pathSegments[0].z;
