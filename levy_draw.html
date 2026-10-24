@@ -52,8 +52,8 @@
     // 3. Add Base Sphere
     const sphereRadius = 8;
     const sphereGeo = new THREE.SphereGeometry(sphereRadius, 48, 48);
-    const sphereMat = new THREE.MeshBasicMaterial({ 
-        color: 0x111625, wireframe: true, transparent: true, opacity: 0.25 
+    const sphereMat = new THREE.MeshBasicMaterial({
+        color: 0x111625, wireframe: true, transparent: true, opacity: 0.25
     });
     const baseSphere = new THREE.Mesh(sphereGeo, sphereMat);
     scene.add(baseSphere);
@@ -118,7 +118,7 @@
     const markerGeo = new THREE.SphereGeometry(0.12, 8, 8);
     const markerMat = new THREE.MeshBasicMaterial({ color: 0xff0055 });
     const marker = new THREE.Mesh(markerGeo, markerMat);
-    scene.add(marker);
+    baseSphere.add(marker);
 
     // 6. Real-time Rendering Loop Tracker
     let drawIndex = 0;
@@ -154,8 +154,6 @@
         }
 
         baseSphere.rotation.y += 0.001;
-        flightPath.rotation.y += 0.001;
-        marker.rotation.y     += 0.001;
 
         controls.update();
         renderer.render(scene, camera);
