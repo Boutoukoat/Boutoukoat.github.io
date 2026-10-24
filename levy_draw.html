@@ -113,7 +113,7 @@
     
     const lineMat = new THREE.LineBasicMaterial({ color: 0x00ffcc });
     const flightPath = new THREE.Line(lineGeo, lineMat);
-    scene.add(flightPath);
+    baseSphere.add(flightPath);
 
     const markerGeo = new THREE.SphereGeometry(0.12, 8, 8);
     const markerMat = new THREE.MeshBasicMaterial({ color: 0xff0055 });
