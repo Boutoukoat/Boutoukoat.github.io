@@ -13,9 +13,9 @@
             white-space: pre-line;
         }
     </style>
-    <!-- Use standard global script tags to entirely avoid local file CORS/ImportMap blocks -->
-    <script src="https://jsdelivr.net"></script>
-    <script src="https://jsdelivr.net"></script>
+    <!-- Use Cloudflare CDNJS URLs to completely bypass jsdelivr network blocks -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cloudflare.com"></script>
 </head>
 <body>
 <div id="info">Generating Prime Gap Path...</div>
@@ -46,7 +46,7 @@
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    // OrbitControls is globally exposed under THREE due to the CDN script style
+    // OrbitControls is globally exposed under THREE using this CDN style
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
 
@@ -70,7 +70,6 @@
     let normalDir  = new THREE.Vector3(0, 1, 0);
 
     const pathSegments = [];
-    const vertexPositions = [];
 
     for (let i = 0; i < gaps.length; i++) {
         let stepLengthRad = gaps[i] * stepScale;
@@ -84,7 +83,6 @@
         normalDir.applyQuaternion(moveQuaternion);
         
         let endPos = currentPos.clone();
-        vertexPositions.push(endPos.clone());
 
         for (let j = 0; j <= segmentsPerStep; j++) {
             let t = j / segmentsPerStep;
@@ -101,6 +99,7 @@
     const maxPoints = pathSegments.length;
     const positions = new Float32Array(maxPoints * 3);
     
+    // Seed initial point
     positions[0] = pathSegments[0].x;
     positions[1] = pathSegments[0].y;
     positions[2] = pathSegments[0].z;
