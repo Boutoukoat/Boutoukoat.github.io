@@ -59,12 +59,12 @@
     scene.add(baseSphere);
 
     // 4. Pre-calculate Geodesic Flight Paths
-    const stepCount = 300;
+    const stepCount = 500;
     const gaps = getPrimeGaps(stepCount);
     const stepScale = 0.03; 
     const segmentsPerStep = 20; 
 
-    let currentPos = new THREE.Vector3(0, sphereRadius, 0); 
+    let currentPos = new THREE.Vector3(0, sphereRadius, sphereRadius); 
     let forwardDir = new THREE.Vector3(0, 0, 1);
     let normalDir  = new THREE.Vector3(0, 1, 0);
 
